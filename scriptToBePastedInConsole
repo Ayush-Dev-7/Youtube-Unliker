@@ -1,0 +1,29 @@
+function unlikeAllVideos() {
+  var maxResults = 50;
+  var pageToken = '';
+  
+  do {
+    var response = YouTube.Videos.list('id', {
+      myRating: 'like',
+      maxResults: maxResults,
+      pageToken: pageToken
+    });
+    
+    if (response.items && response.items.length > 0) {
+      for (var i = 0; i < response.items.length; i++) {
+        var videoId = response.items[i].id;
+        try {
+          YouTube.Videos.rate(videoId, 'none'); // Remove like
+          Logger.log('Unliked video: ' + videoId);
+        } catch (e) {
+          Logger.log('Skipped video (cannot unlike): ' + videoId + ' | Error: ' + e.message);
+        }
+      }
+    }
+    
+    pageToken = response.nextPageToken;
+    
+  } while (pageToken);
+  
+  Logger.log('Done processing liked videos.');
+}
